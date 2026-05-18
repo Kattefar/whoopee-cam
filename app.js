@@ -102,6 +102,26 @@ const addImportedButton = (id, name) => {
 
 const saveImportedSound = (sound) => withSoundStore("readwrite", (store) => store.put(sound));
 
+const removeImportedSound = (sound) => withSoundStore("readwrite", (store) => store.delete(sound.id));
+
+document.querySelector("#removeSound").addEventListener("click", () => {
+  const importedSoundIds = [...importedSounds.keys()];
+  if (!importedSoundIds.length) {
+    setStatus("No imported sounds");
+    return;
+  }
+
+  const lastId = importedSoundIds[importedSoundIds.length - 1];
+  const sound = importedSounds.get(lastId);
+  importedSounds.delete(lastId);
+  removeImportedSound({ id: lastId });
+  const button = document.querySelector(`.sound-choice[data-sound="${lastId}"]`);
+  if (button) {
+    button.remove();
+  }
+  setStatus(`Removed ${sound.name}`);
+});
+
 const loadSavedSounds = async () => {
   try {
     const sounds = await withSoundStore("readonly", (store) => {
@@ -170,9 +190,12 @@ const noiseBuffer = (audio, duration) => {
 };
 
 const playRandomSound = () => {
-  const sounds = document.querySelector(".sound-pad").querySelectorAll('[data-sound]');
-  const randomSound = sounds[Math.floor(Math.random() * sounds.length)];
-  soundMode = randomSound.dataset.sound;
+  let sounds = document.querySelector(".sound-pad").querySelectorAll('[data-sound*="import"]');
+  if(sounds.length === 0){
+    sounds = document.querySelector(".sound-pad").querySelectorAll('[data-sound]')
+  }
+    const randomSound = sounds[Math.floor(Math.random() * sounds.length)];
+    soundMode = randomSound.dataset.sound;
 }
 
 const playWhoopee = () => {
@@ -183,7 +206,7 @@ const playWhoopee = () => {
     playImportedSound(soundMode);
     return;
   }
-
+  
   const audio = ensureAudio();
   const now = audio.currentTime;
   const duration = soundMode === "squeak" ? 0.42 : soundMode === "chaos" ? 0.9 : 0.62;
