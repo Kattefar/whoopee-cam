@@ -1,0 +1,9 @@
+{
+  "name": "Whoopee Cam",
+  "short_name": "Whoopee",
+  "start_url": "./index.html",
+  "display": "standalone",
+  "background_color": "#fff8df",
+  "theme_color": "#f7d84a",
+  "icons": []
+}

@@ -1,0 +1,453 @@
+:root {
+  color-scheme: light;
+  --ink: #191611;
+  --muted: #6d604b;
+  --paper: #fff8df;
+  --gold: #f6cf3d;
+  --coral: #ff6b5d;
+  --teal: #0f9f96;
+  --plum: #4d335f;
+  --shadow: 0 18px 55px rgba(33, 24, 11, 0.22);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  min-height: 100%;
+}
+
+body {
+  margin: 0;
+  font-family:
+    Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  background:
+    radial-gradient(circle at 18% 6%, rgba(255, 107, 93, 0.3), transparent 26rem),
+    linear-gradient(150deg, #fff3ba 0%, #ffd46b 46%, #56c7bb 100%);
+  color: var(--ink);
+  overflow-x: hidden;
+}
+
+button,
+input {
+  font: inherit;
+}
+
+.switch {
+  position: relative;
+  display: inline-block;
+  width: 50px;
+  height: 28px;
+}
+
+/* Hide default checkbox */
+.switch input {
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+/* The track */
+.slider {
+  position: absolute;
+  cursor: pointer;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: #ccc;
+  transition: 0.3s;
+  border-radius: 28px;
+}
+
+/* The circle */
+.slider::before {
+  position: absolute;
+  content: "";
+  height: 22px;
+  width: 22px;
+  left: 3px;
+  bottom: 3px;
+  background-color: white;
+  transition: 0.3s;
+  border-radius: 50%;
+}
+
+/* ON state */
+.switch input:checked + .slider {
+  background-color: #4ade80;
+}
+
+/* Move the circle */
+.switch input:checked + .slider::before {
+  transform: translateX(22px);
+}
+
+.app-shell {
+  width: min(100%, 520px);
+  min-height: 100svh;
+  margin: 0 auto;
+  padding: max(16px, env(safe-area-inset-top)) 14px max(18px, env(safe-area-inset-bottom));
+  display: grid;
+  grid-template-rows: minmax(420px, 1fr) auto;
+  gap: 14px;
+}
+
+.camera-stage {
+  position: relative;
+  min-height: 0;
+  border: 3px solid rgba(25, 22, 17, 0.92);
+  border-radius: 8px;
+  box-shadow: var(--shadow);
+  overflow: hidden;
+  background: #221b16;
+  isolation: isolate;
+}
+
+video {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  filter: saturate(1.15) contrast(1.05);
+}
+
+video.is-front-camera {
+  transform: scaleX(-1);
+}
+
+#motionCanvas {
+  display: none;
+}
+
+.camera-stage::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+  background:
+    linear-gradient(rgba(255, 255, 255, 0.08) 50%, rgba(0, 0, 0, 0.04) 50%) 0 0 / 100% 6px,
+    radial-gradient(circle at 50% 48%, transparent 0 42%, rgba(0, 0, 0, 0.34) 100%);
+  mix-blend-mode: soft-light;
+}
+
+.scan-frame {
+  position: absolute;
+  inset: 20px;
+  z-index: 2;
+  pointer-events: none;
+}
+
+.scan-frame span {
+  position: absolute;
+  width: 34px;
+  height: 34px;
+  border-color: rgba(255, 248, 223, 0.92);
+}
+
+.scan-frame span:nth-child(1) {
+  top: 0;
+  left: 0;
+  border-top: 4px solid;
+  border-left: 4px solid;
+}
+
+.scan-frame span:nth-child(2) {
+  top: 0;
+  right: 0;
+  border-top: 4px solid;
+  border-right: 4px solid;
+}
+
+.scan-frame span:nth-child(3) {
+  right: 0;
+  bottom: 0;
+  border-right: 4px solid;
+  border-bottom: 4px solid;
+}
+
+.scan-frame span:nth-child(4) {
+  bottom: 0;
+  left: 0;
+  border-bottom: 4px solid;
+  border-left: 4px solid;
+}
+
+.status-bar {
+  position: absolute;
+  inset: auto 12px 12px;
+  z-index: 3;
+  display: flex;
+  align-items: end;
+  justify-content: space-between;
+  gap: 14px;
+  padding: 14px;
+  border: 2px solid rgba(25, 22, 17, 0.88);
+  border-radius: 8px;
+  background: rgba(255, 248, 223, 0.92);
+  backdrop-filter: blur(14px);
+}
+
+.eyebrow {
+  margin: 0 0 3px;
+  font-size: 0.76rem;
+  font-weight: 900;
+  letter-spacing: 0;
+  color: var(--plum);
+  text-transform: uppercase;
+}
+
+h1 {
+  margin: 0;
+  max-width: 12ch;
+  font-size: clamp(1.45rem, 8vw, 2.65rem);
+  line-height: 0.95;
+}
+
+.meter {
+  flex: 0 0 62px;
+  height: 108px;
+  display: flex;
+  align-items: end;
+  padding: 6px;
+  border: 2px solid var(--ink);
+  border-radius: 999px;
+  background: #fff;
+}
+
+.meter span {
+  display: block;
+  width: 100%;
+  height: 0%;
+  min-height: 7px;
+  border-radius: inherit;
+  background: linear-gradient(0deg, var(--teal), var(--gold), var(--coral));
+  transition: height 90ms linear;
+}
+
+.controls {
+  display: grid;
+  gap: 12px;
+  padding: 14px;
+  border: 3px solid rgba(25, 22, 17, 0.92);
+  border-radius: 8px;
+  background: var(--paper);
+  box-shadow: var(--shadow);
+}
+
+.primary-button,
+.sound-choice,
+.camera-choice,
+.import-button {
+  min-height: 52px;
+  border: 2px solid var(--ink);
+  border-radius: 8px;
+  color: var(--ink);
+  font-weight: 900;
+  cursor: pointer;
+  touch-action: manipulation;
+}
+
+.primary-button {
+  background: var(--coral);
+  box-shadow: 0 6px 0 var(--ink);
+  font-size: 1.06rem;
+}
+
+.primary-button:active {
+  transform: translateY(4px);
+  box-shadow: 0 2px 0 var(--ink);
+}
+
+.camera-hint {
+  margin: -2px 0 0;
+  color: var(--muted);
+  font-size: 0.78rem;
+  font-weight: 800;
+  line-height: 1.25;
+  text-align: center;
+}
+
+.camera-switch {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.camera-choice {
+  min-width: 0;
+  background: #fff;
+  font-size: 0.9rem;
+}
+
+.camera-choice.is-active {
+  background: var(--gold);
+}
+
+.control-row {
+  display: grid;
+  grid-template-columns: 92px 1fr;
+  align-items: center;
+  gap: 12px;
+  min-height: 42px;
+}
+
+.control-row label {
+  color: var(--muted);
+  font-size: 0.88rem;
+  font-weight: 850;
+}
+
+input[type="range"] {
+  width: 100%;
+  accent-color: var(--teal);
+}
+
+.sound-pad {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(96px, 1fr));
+  gap: 8px;
+}
+
+.sound-choice {
+  min-width: 0;
+  padding: 0 8px;
+  background: #fff;
+  font-size: 0.88rem;
+}
+
+.sound-choice.is-active {
+  background: var(--gold);
+}
+
+.import-button {
+  position: relative;
+  display: grid;
+  place-items: center;
+  background: var(--teal);
+  color: #fff8df;
+  text-align: center;
+}
+
+.import-button input {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.recordings {
+  display: grid;
+  gap: 10px;
+  padding-top: 4px;
+}
+
+.recordings-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.recordings h2 {
+  margin: 0;
+  font-size: 1rem;
+  line-height: 1;
+}
+
+.recordings-header span {
+  color: var(--muted);
+  font-size: 0.82rem;
+  font-weight: 850;
+}
+
+.recording-list {
+  display: grid;
+  gap: 8px;
+}
+
+.recording-card {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  align-items: center;
+  gap: 8px;
+  padding: 8px;
+  border: 2px solid var(--ink);
+  border-radius: 8px;
+  background: #fff;
+}
+
+.recording-card video {
+  position: static;
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  height: auto;
+  border-radius: 6px;
+  background: #221b16;
+  object-fit: cover;
+  transform: none;
+  filter: none;
+}
+
+.recording-card a {
+  display: grid;
+  place-items: center;
+  min-height: 44px;
+  padding: 0 12px;
+  border: 2px solid var(--ink);
+  border-radius: 8px;
+  background: var(--gold);
+  color: var(--ink);
+  font-size: 0.84rem;
+  font-weight: 900;
+  text-decoration: none;
+}
+
+.camera-stage.is-recording .status-bar {
+  outline: 4px solid var(--coral);
+  outline-offset: -8px;
+}
+
+.camera-stage.is-triggered .scan-frame {
+  animation: bonk 180ms ease-in-out 2;
+}
+
+.camera-stage.is-triggered .status-bar {
+  background: rgba(255, 214, 72, 0.96);
+}
+
+@keyframes bonk {
+  50% {
+    transform: scale(0.97) rotate(-1deg);
+  }
+}
+
+@media (min-width: 700px) {
+  .app-shell {
+    padding-top: 24px;
+    padding-bottom: 24px;
+  }
+}
+
+@media (max-width: 420px) {
+  .recording-card {
+    grid-template-columns: 1fr;
+  }
+}
+
+.drop-zone {
+  border: 2px dashed #aaa;
+  padding: 20px;
+  border-radius: 10px;
+  transition: 0.2s;
+}
+
+.drop-zone.dragover {
+  border-color: #4ade80;
+  background: rgba(74, 222, 128, 0.1);
+}

@@ -1,0 +1,89 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <meta name="theme-color" content="#f7d84a" />
+    <title>Whoopee Cam</title>
+    <link rel="manifest" href="manifest.webmanifest" />
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <main class="app-shell">
+      <section class="camera-stage" aria-label="Camera motion detector">
+        <video id="camera" autoplay playsinline muted></video>
+        <canvas id="motionCanvas" width="96" height="72" aria-hidden="true"></canvas>
+        <div class="scan-frame" aria-hidden="true">
+          <span></span>
+          <span></span>
+          <span></span>
+          <span></span>
+        </div>
+        <div class="status-bar">
+          <div>
+            <p class="eyebrow">Whoopee Cam</p>
+            <h1 id="statusText">Ready to arm</h1>
+          </div>
+          <div class="meter" aria-label="Motion level">
+            <span id="meterFill"></span>
+          </div>
+        </div>
+      </section>
+
+      <section class="controls" aria-label="Controls">
+        <button id="armButton" class="primary-button" type="button">
+          <span id="armLabel">Start camera</span>
+        </button>
+        <span>Video recordring:</span>
+        <label class="switch">
+          <input type="checkbox">
+          <span class="slider round"></span>
+        </label>
+        <span>Random sound:</span>
+
+        <label class="switch">
+          <input type="checkbox">
+          <span class="slider round"></span>
+        </label>
+        <div class="camera-switch" aria-label="Camera direction">
+          <button class="camera-choice" type="button" data-facing="user">Front</button>
+          <button class="camera-choice is-active" type="button" data-facing="environment">Back</button>
+        </div>
+        <p id="cameraHint" class="camera-hint">Checking camera access...</p>
+
+        <div class="control-row">
+          <label for="sensitivity">Sensitivity</label>
+          <input id="sensitivity" type="range" min="0" max="100" value="8" />
+        </div>
+
+        <div class="control-row">
+          <label for="cooldown">Cooldown</label>
+          <input id="cooldown" type="range" min="450" max="2400" step="150" value="1050" />
+        </div>
+
+        <div class="sound-pad">
+          <button class="sound-choice is-active" type="button" data-sound="classic">Classic</button>
+          <button class="sound-choice" type="button" data-sound="squeak">Squeak</button>
+          <button class="sound-choice" type="button" data-sound="chaos">Chaos</button>
+        </div>
+
+        <div id="dropZone" class="drop-zone">
+          <label class="import-button" for="soundImport">
+            <span>Import sounds</span>
+            <input id="soundImport" type="file" accept="audio/*" multiple />
+          </label>
+        </div>
+
+        <section class="recordings" aria-label="Recorded clips">
+          <div class="recordings-header">
+            <h2>Clips</h2>
+            <span id="recordingStatus">None yet</span>
+          </div>
+          <div id="recordingList" class="recording-list"></div>
+        </section>
+      </section>
+    </main>
+
+    <script src="app.js"></script>
+  </body>
+</html>
