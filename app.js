@@ -320,7 +320,7 @@ const resetDetector = () => {
 
   if (!armed) return;
 
-  setStatus("Calibrating");
+  // setStatus("Calibrating");
 
   if (resetTimer) {
     window.clearTimeout(resetTimer);
@@ -372,7 +372,7 @@ const recordTriggerClip = () => {
   setStatus("Recording");
 
   if(document.querySelector("#record-video").checked){
-    recordDuration = 5000;
+    recordDuration = 6000;
   }
   window.setTimeout(() => {
     if (activeRecorder?.state === "recording") {
@@ -383,6 +383,14 @@ const recordTriggerClip = () => {
   return true;
 };
 
+const handlewhoopeeTrigger = () => {
+  playWhoopee();
+  stage.classList.add("is-triggered");
+  window.setTimeout(() => {
+    stage.classList.remove("is-triggered");
+    if (armed) resetDetector();
+  }, 520);
+}
 const handleMotionTrigger = () => {
   lastTrigger = Date.now();
   motionStreak = 0;
@@ -391,15 +399,14 @@ const handleMotionTrigger = () => {
   const isRecording = shouldRecord && recordTriggerClip();
 
     setStatus("Motion!");
-
+  if (!isRecording) {
+    handlewhoopeeTrigger();
+  }
+  else{
   window.setTimeout(() => {
-    playWhoopee();
-    stage.classList.add("is-triggered");
-    window.setTimeout(() => {
-      stage.classList.remove("is-triggered");
-      if (armed && !isRecording) resetDetector();
-    }, 520);
+    handlewhoopeeTrigger();
   }, soundDelay);
+  }
 };
 
 const getLuminance = (data, index) =>
