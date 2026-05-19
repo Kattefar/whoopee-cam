@@ -737,6 +737,7 @@ dropZone.addEventListener("dragleave", () => {
 });
 
 document.querySelector("#rotate-camera").addEventListener("click", () => {
-  const nextFacingMode = facingMode === "environment" ? "user" : "environment";
-  setFacingMode(nextFacingMode);
+  document.querySelector(
+  "div.camera-switch button:not(.is-active)"
+).click();
 });
