@@ -24,62 +24,78 @@
             <p class="eyebrow">Whoopee Cam</p>
             <h1 id="statusText">Ready to arm</h1>
           </div>
-          <div class="meter" aria-label="Motion level">
+          <div class="meter" aria-label="Motion level" style="display: none;">
             <span id="meterFill"></span>
           </div>
         </div>
       </section>
-
+      
       <section class="controls" aria-label="Controls">
-        <button id="armButton" class="primary-button" type="button">
+        <div style="display: flex; flex-direction: row; align-items: center; gap: 12px;">
+          <button id="armButton" class="primary-button" type="button" style="width: 100%;">
           <span id="armLabel">Start camera</span>
-        </button>
-        <span>Video recording:</span>
-        <label class="switch">
-          <input type="checkbox">
-          <span class="slider round"></span>
-        </label>
-        <span>Random sound:</span>
-        <label class="switch">
-          <input type="checkbox">
-          <span class="slider round"></span>
-        </label>
-        <div class="camera-switch" aria-label="Camera direction">
-          <button class="camera-choice" type="button" data-facing="user">Front</button>
-          <button class="camera-choice is-active" type="button" data-facing="environment">Back</button>
-        </div>
-        <p id="cameraHint" class="camera-hint">Checking camera access...</p>
-
-        <div class="control-row">
-          <label for="sensitivity">Sensitivity</label>
-          <input id="sensitivity" type="range" min="0" max="100" value="8" />
+          </button>
+          <button class="primary-button" style="background-color: white;">
+            <img src="camera-rotate-solid-full.svg" alt="" id="rotate-camera" style="height:35px;">
+          </button>
         </div>
 
-        <div class="control-row">
-          <label for="cooldown">Cooldown</label>
-          <input id="cooldown" type="range" min="450" max="2400" step="150" value="1050" />
-        </div>
-        <button type="button" id="removeSound" class="sound-choice">Remove Sound</button>
-        <div class="sound-pad">
-          <button class="sound-choice is-active" type="button" data-sound="classic">Classic</button>
-          <button class="sound-choice" type="button" data-sound="squeak">Squeak</button>
-          <button class="sound-choice" type="button" data-sound="chaos">Chaos</button>
-        </div>
-
-        <div id="dropZone" class="drop-zone">
-          <label class="import-button" for="soundImport">
-            <span>Import sounds</span>
-            <input id="soundImport" type="file" accept="audio/*" multiple />
+        <details>
+          <summary>Camera</summary>
+          <span>Video recording:</span>
+          <label class="switch">
+            <input type="checkbox" id="record-video">
+            <span class="slider round"></span>
           </label>
-        </div>
 
-        <section class="recordings" aria-label="Recorded clips">
-          <div class="recordings-header">
-            <h2>Clips</h2>
-            <span id="recordingStatus">None yet</span>
+          <div class="camera-switch" aria-label="Camera direction" style="display: none;">
+            <button class="camera-choice" type="button" data-facing="user">Front</button>
+            <button class="camera-choice is-active" type="button" data-facing="environment">Back</button>
           </div>
-          <div id="recordingList" class="recording-list"></div>
-        </section>
+          <p id="cameraHint" class="camera-hint" style="display: none;">Checking camera access...</p>
+
+          <div class="control-row">
+            <label for="sensitivity">Sensitivity</label>
+            <input id="sensitivity" type="range" min="0" max="100" value="100" />
+          </div>
+
+          <div class="control-row">
+            <label for="cooldown">Cooldown</label>
+            <input id="cooldown" type="range" min="0" max="10000" step="1000" value="3000" />
+          </div>
+
+          <section class="recordings" aria-label="Recorded clips">
+            <div class="recordings-header">
+              <h2>Clips</h2>
+              <span id="recordingStatus">None yet</span>
+            </div>
+            <div id="recordingList" class="recording-list"></div>
+          </section>
+      </details>  
+      <details>
+        <summary>Audio</summary>
+          <span>Random sound:</span>
+          <label class="switch">
+            <input type="checkbox" id="random-sound" checked>
+            <span class="slider round"></span>
+          </label>
+          <button type="button" id="removeSound" class="primary-button" style="margin-bottom: 10px;">Remove Sound</button>
+          <div class="sound-pad" style="margin-bottom: 10px;">
+            <button class="sound-choice is-active" type="button" data-sound="classic">Classic</button>
+            <button class="sound-choice" type="button" data-sound="squeak">Squeak</button>
+            <button class="sound-choice" type="button" data-sound="chaos">Chaos</button>
+          </div>
+          
+
+          <div id="dropZone" class="drop-zone">
+            <label class="import-button" for="soundImport">
+              <span>Import sounds</span>
+              <input id="soundImport" type="file" accept="audio/*" multiple />
+            </label>
+          </div>
+
+        
+      </details>
       </section>
     </main>
 

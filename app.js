@@ -15,7 +15,7 @@ const soundImport = document.querySelector("#soundImport");
 const recordingStatus = document.querySelector("#recordingStatus");
 const recordingList = document.querySelector("#recordingList");
 const savedSoundStore = "whoopee-sounds";
-const recordDuration = 5000;
+let recordDuration = 0;
 const soundDelay = 450;
 const calibrationDuration = 1000;
 const requiredMotionFrames = 10;
@@ -199,7 +199,7 @@ const playRandomSound = () => {
 }
 
 const playWhoopee = () => {
-  if(document.querySelector("body > main > section.controls > label:nth-child(5) > input[type=checkbox]").checked){
+  if(document.querySelector("#random-sound").checked){
     playRandomSound();
   }
   if (soundMode.startsWith("imported:")) {
@@ -330,10 +330,8 @@ const resetDetector = () => {
     window.clearTimeout(triggerTimer);
     triggerTimer = null;
   }
-
-  resetTimer = window.setTimeout(() => {
-    if (armed && !activeRecorder) setStatus("Armed");
-  }, calibrationDuration);
+  
+  if (armed && !activeRecorder) setStatus("Armed");
 };
 
 const recordTriggerClip = () => {
@@ -372,6 +370,10 @@ const recordTriggerClip = () => {
   stage.classList.add("is-recording");
   recordingStatus.textContent = "Recording...";
   setStatus("Recording");
+
+  if(document.querySelector("#record-video").checked){
+    recordDuration = 5000;
+  }
   window.setTimeout(() => {
     if (activeRecorder?.state === "recording") {
       activeRecorder.stop();
@@ -385,13 +387,12 @@ const handleMotionTrigger = () => {
   lastTrigger = Date.now();
   motionStreak = 0;
   meterFill.style.height = "100%";
-  let isRecording
-  if(document.querySelector("body > main > section.controls > label.switch > input[type=checkbox]").checked){
-    recordTriggerClip();
-  }
+  const shouldRecord = document.querySelector("#record-video").checked;
+  const isRecording = shouldRecord && recordTriggerClip();
+
+    setStatus("Motion!");
 
   window.setTimeout(() => {
-    setStatus("Motion!");
     playWhoopee();
     stage.classList.add("is-triggered");
     window.setTimeout(() => {
@@ -400,6 +401,9 @@ const handleMotionTrigger = () => {
     }, 520);
   }, soundDelay);
 };
+
+const getLuminance = (data, index) =>
+  0.2126 * data[index] + 0.7152 * data[index + 1] + 0.0722 * data[index + 2];
 
 const updateBaselineFrame = (frame, blendAmount) => {
   if (!baselineFrame) {
@@ -423,27 +427,26 @@ const motionScoreForFrame = (frame) => {
 
   let fastChanges = 0;
   let slowChanges = 0;
+  const sampleStep = 8;
 
-  for (let i = 0; i < frame.data.length; i += 16) {
-    const fastDelta =
-      Math.abs(frame.data[i] - previousFrame.data[i]) +
-      Math.abs(frame.data[i + 1] - previousFrame.data[i + 1]) +
-      Math.abs(frame.data[i + 2] - previousFrame.data[i + 2]);
-    const slowDelta =
-      Math.abs(frame.data[i] - baselineFrame[i]) +
-      Math.abs(frame.data[i + 1] - baselineFrame[i + 1]) +
-      Math.abs(frame.data[i + 2] - baselineFrame[i + 2]);
+  for (let i = 0; i < frame.data.length; i += sampleStep) {
+    const currentLuma = getLuminance(frame.data, i);
+    const prevLuma = getLuminance(previousFrame.data, i);
+    const baseLuma = getLuminance(baselineFrame, i);
 
-    if (fastDelta > 76) {
+    const fastDelta = Math.abs(currentLuma - prevLuma);
+    const slowDelta = Math.abs(currentLuma - baseLuma);
+
+    if (fastDelta > 28) {
       fastChanges += 1;
     }
 
-    if (slowDelta > 58) {
+    if (slowDelta > 20) {
       slowChanges += 1;
     }
   }
 
-  const sampledPixels = frame.data.length / 16;
+  const sampledPixels = frame.data.length / sampleStep;
   const fastScore = (fastChanges / sampledPixels) * 100;
   const slowScore = (slowChanges / sampledPixels) * 100;
   const score = Math.round(Math.max(fastScore, slowScore * 0.9));
@@ -487,12 +490,15 @@ const detectMotion = () => {
 
   if (!calibrated) {
     motionStreak = 0;
-  } else if (motionScore > threshold) {
+  } else if (motionScore >= threshold) {
     motionStreak += 1;
+  } else if (motionScore >= threshold * 0.45) {
+    motionStreak += 0.25;
   } else {
-    motionStreak = Math.max(0, motionStreak - 2);
+    motionStreak = Math.max(0, motionStreak - 0.5);
   }
 
+  motionStreak = Math.min(requiredMotionFrames, motionStreak);
   const triggerProgress = calibrated && canTrigger ? (motionStreak / requiredMotionFrames) * 100 : 0;
   meterFill.style.height = `${Math.min(100, triggerProgress)}%`;
 
@@ -728,4 +734,9 @@ dropZone.addEventListener("drop", async (e) => {
 
 dropZone.addEventListener("dragleave", () => {
   dropZone.classList.remove("dragover");
+});
+
+document.querySelector("#rotate-camera").addEventListener("click", () => {
+  const nextFacingMode = facingMode === "environment" ? "user" : "environment";
+  setFacingMode(nextFacingMode);
 });
