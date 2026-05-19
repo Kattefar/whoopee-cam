@@ -741,3 +741,61 @@ document.querySelector("#rotate-camera").addEventListener("click", () => {
   "div.camera-switch button:not(.is-active)"
 ).click();
 });
+
+
+// Record audio clip
+
+let mediaRecorder;
+let chunks = [];
+
+const startBtn = document.getElementById("start-audio-recording");
+const stopBtn = document.getElementById("stop-audio-recording");
+
+//
+// SAVE RECORDING
+//
+async function saveRecording(blob) {
+  handleAudioFiles([new File([blob], `whoopee-${Date.now()}.webm`, { type: blob.type })]);
+}
+
+//
+// START RECORDING
+//
+
+startBtn.onclick = async () => {
+  setStatus("Recording audio...");
+  const stream = await navigator.mediaDevices.getUserMedia({
+    audio: true
+  });
+
+  chunks = [];
+
+  mediaRecorder = new MediaRecorder(stream, {
+    mimeType: "audio/webm"
+  });
+
+  mediaRecorder.ondataavailable = (e) => {
+    if (e.data.size > 0) {
+      chunks.push(e.data);
+    }
+  };
+
+  mediaRecorder.onstop = async () => {
+    const blob = new Blob(chunks, {
+      type: "audio/webm"
+    });
+
+    await saveRecording(blob);
+  };
+
+  mediaRecorder.start();
+};
+
+//
+// STOP RECORDING
+//
+stopBtn.onclick = () => {
+  if (mediaRecorder) {
+    mediaRecorder.stop();
+  }
+};
