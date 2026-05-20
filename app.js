@@ -145,6 +145,8 @@ const loadSavedSounds = async () => {
   } catch (error) {
     console.error(error);
   }
+
+  setDatasoundOnStart();
 };
 
 const ensureAudio = () => {
@@ -851,3 +853,23 @@ document.querySelector("#removeAllSound").addEventListener("click", async () => 
   }
   setStatus("All imported sounds removed");
 });
+
+
+
+window.addEventListener("beforeunload", () => {
+  document.querySelector(".sound-pad .is-active")
+  localStorage.setItem("data-sound", document.querySelector(".sound-pad .is-active")?.dataset.sound || "");
+}); 
+
+const setDatasoundOnStart = () => {
+  const savedSound = localStorage.getItem("data-sound");
+  if(savedSound){
+    const button = document.querySelector(`.sound-choice[data-sound="${savedSound}"]`);
+    if(button){
+      button.classList.add("is-active");
+    }
+  }
+  else if(document.querySelector(`.sound-choice`)){
+    document.querySelector(`.sound-choice`).classList.add("is-active");
+  }
+}
