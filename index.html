@@ -39,15 +39,53 @@
             <img src="camera-rotate-solid-full.svg" alt="" id="rotate-camera" style="height:35px;">
           </button>
         </div>
+        <div style="display: flex; flex-direction: row; gap: 5px;">
+          <span>Random sound:</span>
+          <label class="switch">
+            <input type="checkbox" id="random-sound" checked>
+            <span class="slider round"></span>
+          </label>
 
-        <details>
-          <summary>Camera</summary>
           <span>Video recording:</span>
           <label class="switch">
             <input type="checkbox" id="record-video">
             <span class="slider round"></span>
           </label>
+        </div>
+        
+        <div style="display: flex; flex-direction: row; gap: 5px;">
+          <button type="button" id="removeSound" class="primary-button mb10">Remove sound</button>
+          <button type="button" id="removeAllSound" class="primary-button mb10" >Remove all</button>
+        </div>
 
+
+        <div class="sound-pad mb10">
+          <!-- <button class="sound-choice is-active" type="button" data-sound="classic">Classic</button>
+          <button class="sound-choice" type="button" data-sound="squeak">Squeak</button>
+          <button class="sound-choice" type="button" data-sound="chaos">Chaos</button> -->
+        </div>
+
+        <details>
+        <summary>Add sounds</summary>
+          <div id="dropZone" class="drop-zone mb10">
+            <label class="import-button" for="soundImport">
+              <span>Import sounds</span>
+              <input id="soundImport" type="file" accept="audio/*" multiple />
+            </label>
+          </div>
+          <div style="padding: 5px;">
+            <label class="import-button" for="import-standard-sounds">
+              <span>Import standard sounds</span>
+              <input id="import-standard-sounds"/>
+            </label>
+          </div>
+          <p>Audio Recording</p>
+          <button id="start-audio-recording" class="primary-button">Record</button>
+          <button id="stop-audio-recording" class="primary-button">Stop</button>
+        </details>
+
+        <details>
+          <summary>Camera</summary>
           <div class="camera-switch" aria-label="Camera direction" style="display: none;">
             <button class="camera-choice" type="button" data-facing="user">Front</button>
             <button class="camera-choice is-active" type="button" data-facing="environment">Back</button>
@@ -72,32 +110,7 @@
             <div id="recordingList" class="recording-list"></div>
           </section>
       </details>  
-      <details>
-        <summary>Audio</summary>
-          <span>Random sound:</span>
-          <label class="switch">
-            <input type="checkbox" id="random-sound" checked>
-            <span class="slider round"></span>
-          </label>
-          <button type="button" id="removeSound" class="primary-button" style="margin-bottom: 10px;">Remove Sound</button>
-          <button id="start-audio-recording" class="primary-button">Record</button>
-          <button id="stop-audio-recording" class="primary-button">Stop</button>
-          <div class="sound-pad" style="margin-bottom: 10px;">
-            <button class="sound-choice is-active" type="button" data-sound="classic">Classic</button>
-            <button class="sound-choice" type="button" data-sound="squeak">Squeak</button>
-            <button class="sound-choice" type="button" data-sound="chaos">Chaos</button>
-          </div>
-          
-
-          <div id="dropZone" class="drop-zone">
-            <label class="import-button" for="soundImport">
-              <span>Import sounds</span>
-              <input id="soundImport" type="file" accept="audio/*" multiple />
-            </label>
-          </div>
-
-        
-      </details>
+      
       </section>
     </main>
 

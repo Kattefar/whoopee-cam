@@ -445,7 +445,7 @@ input[type="range"] {
 
 .drop-zone {
   border: 2px dashed #aaa;
-  padding: 20px;
+  padding: 5px;
   border-radius: 10px;
   transition: 0.2s;
 }
@@ -453,4 +453,8 @@ input[type="range"] {
 .drop-zone.dragover {
   border-color: #4ade80;
   background: rgba(74, 222, 128, 0.1);
+}
+
+.mb10 {
+  margin-bottom: 10px;
 }

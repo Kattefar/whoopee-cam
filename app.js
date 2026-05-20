@@ -60,8 +60,9 @@ const openSoundDb = () =>
   new Promise((resolve, reject) => {
     const request = indexedDB.open("whoopee-cam", 1);
 
-    request.onupgradeneeded = () => {
+    request.onupgradeneeded = async () => {
       request.result.createObjectStore(savedSoundStore, { keyPath: "id" });
+      putStandardSounds();
     };
     request.onsuccess = () => resolve(request.result);
     request.onerror = () => reject(request.error);
@@ -87,7 +88,8 @@ const withSoundStore = async (mode, callback) => {
 };
 
 const makeSoundId = () => `imported:${Date.now()}:${Math.random().toString(36).slice(2)}`;
-
+const makeStandardSoundId = () => `standard:${Date.now()}:${Math.random().toString(36).slice(2)}`;
+  
 const addImportedButton = (id, name) => {
   const button = document.createElement("button");
 
@@ -190,63 +192,59 @@ const noiseBuffer = (audio, duration) => {
 };
 
 const playRandomSound = () => {
-  let sounds = document.querySelector(".sound-pad").querySelectorAll('[data-sound*="import"]');
-  if(sounds.length === 0){
-    sounds = document.querySelector(".sound-pad").querySelectorAll('[data-sound]')
+  let sounds = document.querySelector(".sound-pad").querySelectorAll('[data-sound]');
+  const randomSound = sounds[Math.floor(Math.random() * sounds.length)];
+  if (!randomSound) {
+    setStatus("No sounds");
+    return;
   }
-    const randomSound = sounds[Math.floor(Math.random() * sounds.length)];
-    soundMode = randomSound.dataset.sound;
+  soundMode = randomSound.dataset.sound;
 }
 
 const playWhoopee = () => {
-  if(document.querySelector("#random-sound").checked){
-    playRandomSound();
-  }
-  if (soundMode.startsWith("imported:")) {
-    playImportedSound(soundMode);
-    return;
-  }
+  playImportedSound(soundMode);
+
   
-  const audio = ensureAudio();
-  const now = audio.currentTime;
-  const duration = soundMode === "squeak" ? 0.42 : soundMode === "chaos" ? 0.9 : 0.62;
+  // const audio = ensureAudio();
+  // const now = audio.currentTime;
+  // const duration = soundMode === "squeak" ? 0.42 : soundMode === "chaos" ? 0.9 : 0.62;
 
-  const oscillator = audio.createOscillator();
-  const filter = audio.createBiquadFilter();
-  const gain = audio.createGain();
-  const noise = audio.createBufferSource();
-  const noiseGain = audio.createGain();
+  // const oscillator = audio.createOscillator();
+  // const filter = audio.createBiquadFilter();
+  // const gain = audio.createGain();
+  // const noise = audio.createBufferSource();
+  // const noiseGain = audio.createGain();
 
-  oscillator.type = soundMode === "squeak" ? "square" : "sawtooth";
-  oscillator.frequency.setValueAtTime(soundMode === "squeak" ? 210 : 118, now);
-  oscillator.frequency.exponentialRampToValueAtTime(soundMode === "squeak" ? 88 : 43, now + duration);
+  // oscillator.type = soundMode === "squeak" ? "square" : "sawtooth";
+  // oscillator.frequency.setValueAtTime(soundMode === "squeak" ? 210 : 118, now);
+  // oscillator.frequency.exponentialRampToValueAtTime(soundMode === "squeak" ? 88 : 43, now + duration);
 
-  filter.type = "lowpass";
-  filter.frequency.setValueAtTime(soundMode === "chaos" ? 980 : 720, now);
-  filter.Q.setValueAtTime(7, now);
+  // filter.type = "lowpass";
+  // filter.frequency.setValueAtTime(soundMode === "chaos" ? 980 : 720, now);
+  // filter.Q.setValueAtTime(7, now);
 
-  gain.gain.setValueAtTime(0.0001, now);
-  gain.gain.exponentialRampToValueAtTime(soundMode === "chaos" ? 0.38 : 0.28, now + 0.04);
-  gain.gain.exponentialRampToValueAtTime(0.0001, now + duration);
+  // gain.gain.setValueAtTime(0.0001, now);
+  // gain.gain.exponentialRampToValueAtTime(soundMode === "chaos" ? 0.38 : 0.28, now + 0.04);
+  // gain.gain.exponentialRampToValueAtTime(0.0001, now + duration);
 
-  noise.buffer = noiseBuffer(audio, duration);
-  noiseGain.gain.setValueAtTime(soundMode === "squeak" ? 0.03 : 0.11, now);
-  noiseGain.gain.exponentialRampToValueAtTime(0.0001, now + duration);
+  // noise.buffer = noiseBuffer(audio, duration);
+  // noiseGain.gain.setValueAtTime(soundMode === "squeak" ? 0.03 : 0.11, now);
+  // noiseGain.gain.exponentialRampToValueAtTime(0.0001, now + duration);
 
-  oscillator.connect(filter);
-  filter.connect(gain);
-  connectToSoundOutput(gain);
-  noise.connect(noiseGain);
-  connectToSoundOutput(noiseGain);
+  // oscillator.connect(filter);
+  // filter.connect(gain);
+  // connectToSoundOutput(gain);
+  // noise.connect(noiseGain);
+  // connectToSoundOutput(noiseGain);
 
-  oscillator.start(now);
-  noise.start(now);
-  oscillator.stop(now + duration);
-  noise.stop(now + duration);
+  // oscillator.start(now);
+  // noise.start(now);
+  // oscillator.stop(now + duration);
+  // noise.stop(now + duration);
 
-  if (soundMode === "chaos") {
-    setTimeout(playPop, 120);
-  }
+  // if (soundMode === "chaos") {
+  //   setTimeout(playPop, 120);
+  // }
 };
 
 const playImportedSound = (id) => {
@@ -384,7 +382,13 @@ const recordTriggerClip = () => {
 };
 
 const handlewhoopeeTrigger = () => {
+  if(document.querySelector("#random-sound").checked){
+    playRandomSound();
+  }
+
   playWhoopee();
+
+  
   stage.classList.add("is-triggered");
   window.setTimeout(() => {
     stage.classList.remove("is-triggered");
@@ -677,7 +681,7 @@ soundPad.addEventListener("click", (event) => {
   selectSound(button);
 });
 
-async function handleAudioFiles(fileList) {
+async function handleAudioFiles(fileList, defaultSound=false) {
   const files = [...fileList].filter((file) =>
     file.type.startsWith("audio/")
   );
@@ -688,7 +692,8 @@ async function handleAudioFiles(fileList) {
 
   for (const file of files) {
     try {
-      const id = makeSoundId();
+
+      const id = defaultSound ? makeStandardSoundId() : makeSoundId();
 
       const arrayBuffer = await file.arrayBuffer();
       const buffer = await audio.decodeAudioData(arrayBuffer.slice(0));
@@ -699,8 +704,8 @@ async function handleAudioFiles(fileList) {
       importedSounds.set(id, { buffer, name });
       const button = addImportedButton(id, name);
 
-      selectSound(button);
-      setStatus("Sound loaded");
+      // selectSound(button);
+      // setStatus("Sound loaded");
 
       try {
         await saveImportedSound({ id, name, arrayBuffer });
@@ -748,7 +753,6 @@ document.querySelector("#rotate-camera").addEventListener("click", () => {
   "div.camera-switch button:not(.is-active)"
 ).click();
 });
-
 
 // Record audio clip
 
@@ -806,3 +810,44 @@ stopBtn.onclick = () => {
     mediaRecorder.stop();
   }
 };
+
+const putStandardSounds = async() => {
+        // hent lydfil
+      
+      const response = await fetch("/sounds/sounds.json");
+      const sounds = await response.json();
+
+      for (const sound of sounds) {
+        const soundResponse = await fetch(sound.file);
+        const blob = await soundResponse.blob();
+
+        handleAudioFiles([new File([blob], `${sound.id}.mp3`, { type: blob.type })], true);
+      } 
+
+      console.log("Standard lyd gemt");
+}
+
+document.querySelector("#import-standard-sounds").addEventListener("click", async () => {
+  setStatus("Importing standard sounds...");
+  await putStandardSounds();
+  setStatus("Standard sounds imported");
+});
+
+document.querySelector("#removeAllSound").addEventListener("click", async () => {
+  alert("Are you sure you want to remove all imported sounds? This can't be undone.");
+  const importedSoundIds = [...importedSounds.keys()];
+  if (!importedSoundIds.length) {
+    setStatus("No imported sounds");
+    return;
+  }
+
+  for(const id of importedSoundIds){
+    importedSounds.delete(id);
+    removeImportedSound({ id });
+    const button = document.querySelector(`.sound-choice[data-sound="${id}"]`);
+    if (button) {
+      button.remove();
+    }
+  }
+  setStatus("All imported sounds removed");
+});
