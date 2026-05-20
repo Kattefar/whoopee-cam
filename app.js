@@ -816,7 +816,7 @@ stopBtn.onclick = () => {
 const putStandardSounds = async() => {
         // hent lydfil
       
-      const response = await fetch("/sounds/sounds.json");
+      const response = await fetch("sounds/sounds.json");
       const sounds = await response.json();
 
       for (const sound of sounds) {
